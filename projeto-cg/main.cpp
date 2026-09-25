@@ -1,12 +1,7 @@
-#ifdef __APPLE__
-#include <glut.h>
-#elif _WIN32
-#include <GL/glut.h>
-#else
-#include <GL/glut.h>
-#endif>
-#include <stdlib.h>
-#include <math.h>
+#include "ponto.h"
+#include "bezier.h"
+#include "ArquivoOBJ.h"
+#include "transformacoes.h"
 
 /*  Set initial size of the display window.  */
 GLsizei winWidth = 600, winHeight = 600;
