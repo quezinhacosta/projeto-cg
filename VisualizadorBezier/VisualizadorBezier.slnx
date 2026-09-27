@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="VisualizadorBezier.vcxproj" />
+  <Project Path="VisualizadorBezier.vcxproj" Id="dd95e184-1590-44bd-806b-6bb6dc0682b9" />
 </Solution>

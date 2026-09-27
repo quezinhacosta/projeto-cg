@@ -367,3 +367,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Arquivos OBJ dos desenhos são dados do projeto, não arquivos de compilação.
+!/VisualizadorBezier/desenhos/
+!/VisualizadorBezier/desenhos/*.obj
