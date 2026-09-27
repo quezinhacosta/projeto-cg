@@ -249,7 +249,9 @@
             "c:\\program files (x86)\\windows kits\\10\\include\\10.0.26100.0\\um\\imm.h",
             "c:\\program files (x86)\\windows kits\\10\\include\\10.0.26100.0\\um\\ime_cmodes.h",
             "d:\\vcpkg\\installed\\x64-windows\\include\\gl\\gl.h",
-            "d:\\vcpkg\\installed\\x64-windows\\include\\gl\\glu.h"
+            "d:\\vcpkg\\installed\\x64-windows\\include\\gl\\glu.h",
+            "d:\\vcpkg\\installed\\x64-windows\\include\\gl\\glui.h",
+            "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\array"
         ],
         "ImportedModules": [],
         "ImportedHeaderUnits": []

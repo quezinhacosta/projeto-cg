@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <GL/glut.h>
+#include <GL/glui.h>
 
 struct Ponto {
     double x;

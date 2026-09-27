@@ -111,12 +111,12 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>D:\vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\vcpkg\installed\x64-windows\include;"D:\vcpkg\installed\x64-windows\lib\glui.lib"</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>"D:\vcpkg\installed\x64-windows\lib"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\vcpkg\installed\x64-windows\lib;"D:\vcpkg\installed\x64-windows\lib\glui.lib"</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glu32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
