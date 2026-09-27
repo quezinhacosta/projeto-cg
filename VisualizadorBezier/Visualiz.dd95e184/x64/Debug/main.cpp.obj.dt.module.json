@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "Visualiz.dd95e184\\x64\\Debug\\main.obj",
+            "outputs": [
+                "Visualiz.dd95e184\\x64\\Debug\\main.cpp.obj.dt.module.json",
+                "Visualiz.dd95e184\\x64\\Debug\\main.cpp.obj.dt.d.json"
+            ],
+            "requires": []
+        }
+    ]
+}
