@@ -16,6 +16,10 @@ struct Ponto {
 
 std::vector<Ponto> pontosControle;
 
+// GLUI: identificacao da janela que exibe a curva e do campo de arquivo.
+int janelaVisualizacao = 0;
+GLUI_EditText* campoArquivo = nullptr;
+
 double esquerda = -100.0;
 double direita = 100.0;
 double baixo = -100.0;
@@ -54,6 +58,7 @@ bool carregarObj(const std::string& caminho) {
         return false;
     }
 
+    // So substitui a curva atual depois que o novo arquivo foi validado.
     pontosControle = pontos;
     std::cout << "Arquivo carregado: " << caminho << '\n';
     return true;
@@ -98,18 +103,21 @@ void desenhar() {
     glVertex2d(0.0, cima);
     glEnd();
 
-    // Curva: vermelha.
-    glColor3f(0.9f, 0.1f, 0.1f);
-    glBegin(GL_LINE_STRIP);
+    if (!pontosControle.empty()) {
+        // Curva: vermelha.
+        glColor3f(0.9f, 0.1f, 0.1f);
+        glBegin(GL_LINE_STRIP);
 
-    const int amostras = 100;
-    for (int i = 0; i <= amostras; ++i) {
-        const double t = static_cast<double>(i) / amostras;
-        const Ponto ponto = calcularBezier(t);
-        glVertex2d(ponto.x, ponto.y);
+        const int amostras = 100;
+        for (int i = 0; i <= amostras; ++i) {
+            const double t = static_cast<double>(i) / amostras;
+            const Ponto ponto = calcularBezier(t);
+            glVertex2d(ponto.x, ponto.y);
+        }
+
+        glEnd();
     }
 
-    glEnd();
     glutSwapBuffers();
 }
 
@@ -132,14 +140,12 @@ void redimensionar(int largura, int altura) {
         maxY = std::max(maxY, ponto.y);
     }
 
-    // Evita uma area de visualizacao pequena demais.
     const double larguraBase = std::max(maxX - minX, 20.0);
     const double alturaBase = std::max(maxY - minY, 20.0);
 
     const double centroX = (minX + maxX) / 2.0;
     const double centroY = (minY + maxY) / 2.0;
 
-    // Acrescenta margem e expande uma das dimensoes conforme a janela.
     double larguraVisivel = larguraBase * 1.2;
     double alturaVisivel = alturaBase * 1.2;
 
@@ -166,6 +172,36 @@ void redimensionar(int largura, int altura) {
     glutPostRedisplay();
 }
 
+// GLUI: esta funcao sera chamada ao clicar no botao "Carregar".
+void carregarPelaInterface(int) {
+    if (campoArquivo == nullptr) {
+        return;
+    }
+
+    const std::string caminho = campoArquivo->get_text();
+
+    if (caminho.empty()) {
+        std::cerr << "Informe o caminho de um arquivo .obj.\n";
+        return;
+    }
+
+    if (!carregarObj(caminho)) {
+        // Em caso de erro, a curva anterior permanece na tela.
+        return;
+    }
+
+    // O callback veio da janela GLUI. Selecionamos a janela OpenGL
+    // antes de consultar seu tamanho e atualizar a projecao.
+    glutSetWindow(janelaVisualizacao);
+
+    redimensionar(
+        glutGet(GLUT_WINDOW_WIDTH),
+        glutGet(GLUT_WINDOW_HEIGHT)
+    );
+
+    std::cout << "Curva atualizada pela interface.\n";
+}
+
 void teclado(unsigned char tecla, int, int) {
     if (tecla == 'q' || tecla == 'Q' || tecla == 27) {
         std::exit(0);
@@ -182,9 +218,12 @@ int main(int argc, char** argv) {
     }
 
     glutInit(&argc, argv);
+
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(800, 600);
-    glutCreateWindow("Visualizador de Curvas de Bezier");
+
+    janelaVisualizacao =
+        glutCreateWindow("Visualizador de Curvas de Bezier");
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -192,6 +231,15 @@ int main(int argc, char** argv) {
     glutReshapeFunc(redimensionar);
     glutKeyboardFunc(teclado);
 
+    // GLUI: janela separada com campo de texto e botao.
+    GLUI* interface = GLUI_Master.create_glui("Controles");
+    campoArquivo = interface->add_edittext("Arquivo OBJ:");
+    campoArquivo->set_text(caminho.c_str());
+
+    interface->add_button("Carregar", 0, carregarPelaInterface);
+    interface->set_main_gfx_window(janelaVisualizacao);
+    
     glutMainLoop();
+
     return 0;
 }
