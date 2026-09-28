@@ -251,6 +251,10 @@ void botaoSairCallback(int) {
     std::exit(0);
 }
 
+void botaoSairCallback(int) {
+    std::exit(0);
+}
+
 // ==========================================
 // Função Principal
 // ==========================================
@@ -282,7 +286,7 @@ int main(int argc, char** argv) {
     campoArquivo->set_text(caminho.c_str());
 
     interface->add_button("Carregar", 0, carregarPelaInterface);
-    interface->add_button("Sair", 0, botaoSairCallback); // Botão Sair exigido
+    interface->add_button("Sair", 0, botaoSairCallback);
     interface->set_main_gfx_window(janelaVisualizacao);
 
     glutMainLoop();
