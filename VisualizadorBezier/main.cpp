@@ -208,6 +208,10 @@ void teclado(unsigned char tecla, int, int) {
     }
 }
 
+void botaoSairCallback(int) {
+    std::exit(0);
+}
+
 int main(int argc, char** argv) {
     // Guardamos o caminho antes de glutInit, que pode processar argumentos.
     const std::string caminho =
@@ -237,6 +241,7 @@ int main(int argc, char** argv) {
     campoArquivo->set_text(caminho.c_str());
 
     interface->add_button("Carregar", 0, carregarPelaInterface);
+    interface->add_button("Sair", 0, botaoSairCallback);
     interface->set_main_gfx_window(janelaVisualizacao);
     
     glutMainLoop();
