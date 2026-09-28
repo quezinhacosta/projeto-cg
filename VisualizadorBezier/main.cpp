@@ -9,6 +9,9 @@
 #include <GL/glut.h>
 #include <GL/glui.h>
 
+// ==========================================
+// Estruturas e Variáveis Globais
+// ==========================================
 struct Ponto {
     double x;
     double y;
@@ -26,8 +29,11 @@ double cima     =  100.0;
 // GLUI: Identificadores da interface
 int janelaVisualizacao = 0;
 GLUI_EditText* campoArquivo = nullptr;
+GLUI_EditText* campoSalvar = nullptr;
 
-
+// ==========================================
+// Lógica de Arquivo (.obj) e Curvas
+// ==========================================
 bool carregarObj(const std::string& caminho) {
     std::ifstream arquivo(caminho);
 
@@ -67,6 +73,29 @@ bool carregarObj(const std::string& caminho) {
     return true;
 }
 
+bool salvarObj(const std::string& caminho) {
+    if (pontosControle.empty()) {
+        std::cerr << "Nenhum ponto de controle para salvar.\n";
+        return false;
+    }
+
+    std::ofstream arquivo(caminho);
+    if (!arquivo) {
+        std::cerr << "Erro ao criar o arquivo: " << caminho << '\n';
+        return false;
+    }
+
+    arquivo << "# Arquivo gerado pelo Visualizador de Curvas de Bezier\n";
+    arquivo << "# Pontos de controle da curva\n\n";
+
+    for (const auto& pt : pontosControle) {
+        arquivo << "v " << pt.x << " " << pt.y << "\n";
+    }
+
+    std::cout << "Figura salva com sucesso em: " << caminho << '\n';
+    return true;
+}
+
 Ponto calcularBezier(double t) {
     const double u = 1.0 - t;
 
@@ -85,6 +114,9 @@ Ponto calcularBezier(double t) {
     };
 }
 
+// ==========================================
+// Renderização OpenGL
+// ==========================================
 void desenharEixos() {
     glLineWidth(2.0f);
 
@@ -204,6 +236,9 @@ void redimensionar(int largura, int altura) {
     glutPostRedisplay();
 }
 
+// ==========================================
+// Callbacks de Teclado e Menus
+// ==========================================
 void teclado(unsigned char tecla, int, int) {
     if (tecla == 'q' || tecla == 'Q' || tecla == 27) {
         std::exit(0);
@@ -229,6 +264,9 @@ void criarMenu() {
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
+// ==========================================
+// Callbacks GLUI
+// ==========================================
 void carregarPelaInterface(int) {
     if (campoArquivo == nullptr) return;
 
@@ -247,8 +285,16 @@ void carregarPelaInterface(int) {
     std::cout << "Curva atualizada pela interface.\n";
 }
 
-void botaoSairCallback(int) {
-    std::exit(0);
+void salvarPelaInterface(int) {
+    if (campoSalvar == nullptr) return;
+
+    const std::string caminho = campoSalvar->get_text();
+    if (caminho.empty()) {
+        std::cerr << "Informe um nome de arquivo valido para salvar.\n";
+        return;
+    }
+
+    salvarObj(caminho);
 }
 
 void botaoSairCallback(int) {
@@ -282,11 +328,21 @@ int main(int argc, char** argv) {
 
     // Configuração da interface GLUI
     GLUI* interface = GLUI_Master.create_glui("Controles");
+    
     campoArquivo = interface->add_edittext("Arquivo OBJ:");
     campoArquivo->set_text(caminho.c_str());
-
     interface->add_button("Carregar", 0, carregarPelaInterface);
+
+    interface->add_separator();
+
+    campoSalvar = interface->add_edittext("Salvar como:");
+    campoSalvar->set_text("desenhos/salvo.obj");
+    interface->add_button("Salvar", 0, salvarPelaInterface);
+
+    interface->add_separator();
+
     interface->add_button("Sair", 0, botaoSairCallback);
+
     interface->set_main_gfx_window(janelaVisualizacao);
 
     glutMainLoop();
