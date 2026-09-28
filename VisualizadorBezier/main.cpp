@@ -16,9 +16,10 @@ struct Ponto {
 
 std::vector<Ponto> pontosControle;
 
-// GLUI: identificacao da janela que exibe a curva e do campo de arquivo.
+// GLUI: identificacao da janela que exibe a curva e dos campos de arquivo.
 int janelaVisualizacao = 0;
 GLUI_EditText* campoArquivo = nullptr;
+GLUI_EditText* campoSalvar = nullptr;
 
 double esquerda = -100.0;
 double direita = 100.0;
@@ -61,6 +62,29 @@ bool carregarObj(const std::string& caminho) {
     // So substitui a curva atual depois que o novo arquivo foi validado.
     pontosControle = pontos;
     std::cout << "Arquivo carregado: " << caminho << '\n';
+    return true;
+}
+
+bool salvarObj(const std::string& caminho) {
+    if (pontosControle.empty()) {
+        std::cerr << "Nenhum ponto de controle para salvar.\n";
+        return false;
+    }
+
+    std::ofstream arquivo(caminho);
+    if (!arquivo) {
+        std::cerr << "Erro ao criar o arquivo: " << caminho << '\n';
+        return false;
+    }
+
+    arquivo << "# Arquivo gerado pelo Visualizador de Curvas de Bezier\n";
+    arquivo << "# Pontos de controle da curva\n\n";
+
+    for (const auto& pt : pontosControle) {
+        arquivo << "v " << pt.x << " " << pt.y << "\n";
+    }
+
+    std::cout << "Figura salva com sucesso em: " << caminho << '\n';
     return true;
 }
 
@@ -172,7 +196,6 @@ void redimensionar(int largura, int altura) {
     glutPostRedisplay();
 }
 
-// GLUI: esta funcao sera chamada ao clicar no botao "Carregar".
 void carregarPelaInterface(int) {
     if (campoArquivo == nullptr) {
         return;
@@ -186,12 +209,9 @@ void carregarPelaInterface(int) {
     }
 
     if (!carregarObj(caminho)) {
-        // Em caso de erro, a curva anterior permanece na tela.
         return;
     }
 
-    // O callback veio da janela GLUI. Selecionamos a janela OpenGL
-    // antes de consultar seu tamanho e atualizar a projecao.
     glutSetWindow(janelaVisualizacao);
 
     redimensionar(
@@ -202,6 +222,21 @@ void carregarPelaInterface(int) {
     std::cout << "Curva atualizada pela interface.\n";
 }
 
+void salvarPelaInterface(int) {
+    if (campoSalvar == nullptr) {
+        return;
+    }
+
+    const std::string caminho = campoSalvar->get_text();
+
+    if (caminho.empty()) {
+        std::cerr << "Informe um nome de arquivo valido para salvar.\n";
+        return;
+    }
+
+    salvarObj(caminho);
+}
+
 void teclado(unsigned char tecla, int, int) {
     if (tecla == 'q' || tecla == 'Q' || tecla == 27) {
         std::exit(0);
@@ -209,7 +244,6 @@ void teclado(unsigned char tecla, int, int) {
 }
 
 int main(int argc, char** argv) {
-    // Guardamos o caminho antes de glutInit, que pode processar argumentos.
     const std::string caminho =
         (argc > 1) ? argv[1] : "desenhos/teste.obj";
 
@@ -231,12 +265,19 @@ int main(int argc, char** argv) {
     glutReshapeFunc(redimensionar);
     glutKeyboardFunc(teclado);
 
-    // GLUI: janela separada com campo de texto e botao.
+    // GLUI: janela separada com controles de carregar e salvar
     GLUI* interface = GLUI_Master.create_glui("Controles");
+    
     campoArquivo = interface->add_edittext("Arquivo OBJ:");
     campoArquivo->set_text(caminho.c_str());
-
     interface->add_button("Carregar", 0, carregarPelaInterface);
+
+    interface->add_separator();
+
+    campoSalvar = interface->add_edittext("Salvar como:");
+    campoSalvar->set_text("desenhos/salvo.obj");
+    interface->add_button("Salvar", 0, salvarPelaInterface);
+
     interface->set_main_gfx_window(janelaVisualizacao);
     
     glutMainLoop();
