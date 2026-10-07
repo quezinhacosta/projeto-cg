@@ -43,13 +43,16 @@ bool carregarObj(const std::string& caminho) {
         // Comentarios (#) e linhas vazias sao ignorados
     }
 
-    if (pontos.size() != 4) {
+    if (pontos.empty()) {
         std::cerr
-            << "Este primeiro teste precisa de exatamente 4 pontos; "
-            << "o arquivo contem " << pontos.size() << ".\n";
+            << "O arquivo nao possui pontos de controle.\n";
 
         return false;
     }
+
+    std::cout << "Quantidade de pontos carregados: "
+            << pontos.size() << "\n";
+
 
     // So substitui os pontos depois que o arquivo foi validado
     pontosControle = pontos;

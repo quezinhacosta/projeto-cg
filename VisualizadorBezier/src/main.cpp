@@ -37,7 +37,7 @@ int main(int argc, char** argv)
     const std::string caminho =
         (argc > 1)
             ? argv[1]
-            : "desenhos/teste2.obj";
+            : "desenhos/mario.obj";
 
     // ------------------------------------------
     // Carrega o arquivo OBJ
