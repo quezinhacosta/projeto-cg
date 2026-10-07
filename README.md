@@ -42,3 +42,29 @@ Resultado esperado: janela branca com eixo X verde e eixo Y azul.
 ## Próxima etapa
 
 Ler de um arquivo `.obj` quatro pontos de controle e desenhar uma curva de Bézier cúbica. Depois, ampliar a leitura para curvas concatenadas e calcular o enquadramento automático da figura.
+
+
+
+visando rodar o codigo no linux, basta
+```
+cd projeto-cg/VisualizadorBezier
+```
+
+
+rode isto para compilar todos os aquivos com seus .h
+```
+g++ src/main.cpp \
+          src/ArquivoOBJ.cpp \
+          src/Bezier.cpp \
+          src/Menu.cpp \
+          src/Visualizacao.cpp \
+          src/Transformacoes.cpp \
+          -Iinclude \
+          -I/usr/local/include \
+          -L/usr/local/lib \
+          -lglui \
+          -lglut \
+          -lGLU \
+          -lGL \
+          -o curvas
+```
