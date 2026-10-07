@@ -1,11 +1,12 @@
 #include "Bezier.h"
 
-#include <vector>
-
-// Acesso aos pontos de controle definidos no programa principal
-extern std::vector<Ponto> pontosControle;
-
-Ponto calcularBezier(double t) {
+Ponto calcularBezier(
+    const Ponto& p0,
+    const Ponto& p1,
+    const Ponto& p2,
+    const Ponto& p3,
+    double t
+) {
     const double u = 1.0 - t;
 
     // Polinômios de Bernstein de grau 3
@@ -15,15 +16,7 @@ Ponto calcularBezier(double t) {
     const double d = t * t * t;
 
     return {
-        a * pontosControle[0].x
-            + b * pontosControle[1].x
-            + c * pontosControle[2].x
-            + d * pontosControle[3].x,
-
-        a * pontosControle[0].y
-            + b * pontosControle[1].y
-            + c * pontosControle[2].y
-            + d * pontosControle[3].y
+        a * p0.x + b * p1.x + c * p2.x + d * p3.x,
+        a * p0.y + b * p1.y + c * p2.y + d * p3.y
     };
 }
-

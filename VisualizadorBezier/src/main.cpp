@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <vector>
 
 #include <GL/glut.h>
 
@@ -15,8 +14,8 @@
 // Variáveis globais do programa
 // ==========================================
 
-// Pontos de controle
-std::vector<Ponto> pontosControle;
+// Figura composta por contornos Bezier independentes
+FiguraBezier figuraBezier;
 
 // Controle de visualização
 double esquerda = -100.0;
@@ -37,7 +36,7 @@ int main(int argc, char** argv)
     const std::string caminho =
         (argc > 1)
             ? argv[1]
-            : "desenhos/teste2.obj";
+            : "desenhos/rosa.obj";
 
     // ------------------------------------------
     // Carrega o arquivo OBJ

@@ -1,14 +1,14 @@
 #include "ArquivoOBJ.h"
 #include "Ponto.h"
 
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <vector>
+#include <utility>
 
-// Acesso aos pontos de controle definidos no programa principal
-extern std::vector<Ponto> pontosControle;
+extern FiguraBezier figuraBezier;
 
 // ==========================================
 // Carregar arquivo OBJ
@@ -22,39 +22,79 @@ bool carregarObj(const std::string& caminho) {
         return false;
     }
 
-    std::vector<Ponto> pontos;
+    FiguraBezier figura;
+    ContornoBezier contornoAtual;
     std::string linha;
+    std::size_t numeroLinha = 0;
 
     while (std::getline(arquivo, linha)) {
+        ++numeroLinha;
         std::istringstream leitor(linha);
         std::string tipo;
+        if (!(leitor >> tipo) || tipo[0] == '#') {
+            continue;
+        }
 
-        leitor >> tipo;
+        if (tipo == "o" || tipo == "g") {
+            if (!contornoAtual.empty()) {
+                figura.push_back(std::move(contornoAtual));
+                contornoAtual.clear();
+            }
+            continue;
+        }
 
-        // Linhas que indicam vertices com coordenadas (x, y)
         if (tipo == "v") {
             Ponto ponto;
 
-            if (leitor >> ponto.x >> ponto.y) {
-                pontos.push_back(ponto);
+            if (!(leitor >> ponto.x >> ponto.y)
+                || !std::isfinite(ponto.x)
+                || !std::isfinite(ponto.y)) {
+                std::cerr << "Erro: vertice invalido na linha "
+                          << numeroLinha << " de " << caminho << ".\n";
+                return false;
             }
-        }
 
-        // Comentarios (#) e linhas vazias sao ignorados
+            contornoAtual.push_back(ponto);
+        }
     }
 
-    if (pontos.size() != 4) {
-        std::cerr
-            << "Este primeiro teste precisa de exatamente 4 pontos; "
-            << "o arquivo contem " << pontos.size() << ".\n";
+    if (!contornoAtual.empty()) {
+        figura.push_back(std::move(contornoAtual));
+    }
 
+    std::size_t totalPontos = 0;
+    std::size_t totalCurvas = 0;
+    for (std::size_t i = 0; i < figura.size(); ++i) {
+        const std::size_t quantidade = figura[i].size();
+        totalPontos += quantidade;
+
+        if (quantidade < 4 || (quantidade - 1) % 3 != 0) {
+            std::cerr << "Erro: o contorno " << (i + 1) << " de " << caminho
+                      << " possui " << quantidade
+                      << " pontos; cada contorno deve ter ao menos 4 pontos "
+                         "e obedecer a regra 3k + 1.\n";
+            return false;
+        }
+
+        totalCurvas += (quantidade - 1) / 3;
+    }
+
+    if (totalPontos < 4) {
+        std::cerr << "Erro: o arquivo precisa conter ao menos 4 pontos de controle.\n";
         return false;
     }
 
-    // So substitui os pontos depois que o arquivo foi validado
-    pontosControle = pontos;
+    if (totalPontos < 300) {
+        std::cout << "Aviso: o arquivo contem " << totalPontos
+                  << " pontos de controle (a entrega final exige no minimo 300).\n";
+    }
 
-    std::cout << "Arquivo carregado: " << caminho << '\n';
+    figuraBezier = std::move(figura);
+
+    std::cout << "Arquivo carregado com sucesso: " << caminho
+              << " (" << totalPontos << " pontos, "
+              << totalCurvas << " trechos cubicos em "
+              << figuraBezier.size() << " contorno(s))\n";
 
     return true;
 }
@@ -64,7 +104,7 @@ bool carregarObj(const std::string& caminho) {
 // ==========================================
 
 bool salvarObj(const std::string& caminho) {
-    if (pontosControle.empty()) {
+    if (figuraBezier.empty()) {
         std::cerr << "Nenhum ponto de controle para salvar.\n";
         return false;
     }
@@ -72,25 +112,22 @@ bool salvarObj(const std::string& caminho) {
     std::ofstream arquivo(caminho);
 
     if (!arquivo) {
-        std::cerr
-            << "Erro ao criar o arquivo: "
-            << caminho << '\n';
-
+        std::cerr << "Erro ao criar o arquivo: " << caminho << '\n';
         return false;
     }
 
     arquivo << "# Arquivo gerado pelo Visualizador de Curvas de Bezier\n";
-    arquivo << "# Pontos de controle da curva\n\n";
+    arquivo << "# Cada objeto representa um contorno Bezier independente\n\n";
 
-    for (const auto& pt : pontosControle) {
-        arquivo << "v "
-                << pt.x << " "
-                << pt.y << "\n";
+    for (std::size_t i = 0; i < figuraBezier.size(); ++i) {
+        arquivo << "o contorno_" << (i + 1) << "\n";
+        for (const auto& pt : figuraBezier[i]) {
+            arquivo << "v " << pt.x << " " << pt.y << "\n";
+        }
+        arquivo << "\n";
     }
 
-    std::cout
-        << "Figura salva com sucesso em: "
-        << caminho << '\n';
+    std::cout << "Figura salva com sucesso em: " << caminho << '\n';
 
     return true;
 }

@@ -4,15 +4,13 @@
 #include "Ponto.h"
 
 #include <algorithm>
-#include <vector>
-
 #include <GL/glut.h>
 
 // ==========================================
 // Variáveis externas
 // ==========================================
 
-extern std::vector<Ponto> pontosControle;
+extern FiguraBezier figuraBezier;
 
 extern bool exibirPoligono;
 
@@ -54,7 +52,7 @@ void desenharEixos() {
 // ==========================================
 
 void desenharPoligonoDeControle() {
-    if (pontosControle.empty()) {
+    if (figuraBezier.empty()) {
         return;
     }
 
@@ -62,13 +60,13 @@ void desenharPoligonoDeControle() {
     glColor3f(0.5f, 0.5f, 0.5f);
     glLineWidth(1.0f);
 
-    glBegin(GL_LINE_STRIP);
-
-    for (const auto& pt : pontosControle) {
-        glVertex2d(pt.x, pt.y);
+    for (const auto& contorno : figuraBezier) {
+        glBegin(GL_LINE_STRIP);
+        for (const auto& pt : contorno) {
+            glVertex2d(pt.x, pt.y);
+        }
+        glEnd();
     }
-
-    glEnd();
 
     // Vértices de controle
     glColor3f(0.2f, 0.2f, 0.2f);
@@ -76,8 +74,10 @@ void desenharPoligonoDeControle() {
 
     glBegin(GL_POINTS);
 
-    for (const auto& pt : pontosControle) {
-        glVertex2d(pt.x, pt.y);
+    for (const auto& contorno : figuraBezier) {
+        for (const auto& pt : contorno) {
+            glVertex2d(pt.x, pt.y);
+        }
     }
 
     glEnd();
@@ -96,7 +96,7 @@ void desenhar() {
     // Desenha os eixos
     desenharEixos();
 
-    if (!pontosControle.empty()) {
+    if (!figuraBezier.empty()) {
 
         // Desenha o polígono de controle,
         // caso essa opção esteja ativada
@@ -108,20 +108,26 @@ void desenhar() {
         glColor3f(0.9f, 0.1f, 0.1f);
         glLineWidth(2.5f);
 
-        glBegin(GL_LINE_STRIP);
-
         const int amostras = 100;
 
-        for (int i = 0; i <= amostras; ++i) {
-            const double t =
-                static_cast<double>(i) / amostras;
-
-            const Ponto ponto = calcularBezier(t);
-
-            glVertex2d(ponto.x, ponto.y);
+        for (const auto& contorno : figuraBezier) {
+            glBegin(GL_LINE_STRIP);
+            for (std::size_t i = 0; i + 3 < contorno.size(); i += 3) {
+                for (int amostra = 0; amostra <= amostras; ++amostra) {
+                    const double t =
+                        static_cast<double>(amostra) / amostras;
+                    const Ponto ponto = calcularBezier(
+                        contorno[i],
+                        contorno[i + 1],
+                        contorno[i + 2],
+                        contorno[i + 3],
+                        t
+                    );
+                    glVertex2d(ponto.x, ponto.y);
+                }
+            }
+            glEnd();
         }
-
-        glEnd();
     }
 
     glutSwapBuffers();
@@ -144,12 +150,14 @@ void redimensionar(int largura, int altura) {
     double minY = 0.0;
     double maxY = 0.0;
 
-    for (const Ponto& ponto : pontosControle) {
-        minX = std::min(minX, ponto.x);
-        maxX = std::max(maxX, ponto.x);
+    for (const auto& contorno : figuraBezier) {
+        for (const Ponto& ponto : contorno) {
+            minX = std::min(minX, ponto.x);
+            maxX = std::max(maxX, ponto.x);
 
-        minY = std::min(minY, ponto.y);
-        maxY = std::max(maxY, ponto.y);
+            minY = std::min(minY, ponto.y);
+            maxY = std::max(maxY, ponto.y);
+        }
     }
 
     const double larguraBase =
