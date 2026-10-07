@@ -1,4 +1,6 @@
 #include "Visualizacao.h"
+#include "Transformacoes.h"
+#include "Menu.h"
 
 #include "Bezier.h"
 #include "Ponto.h"
@@ -87,24 +89,28 @@ void desenharPoligonoDeControle() {
 // Desenho principal
 // ==========================================
 
-void desenhar() {
+
+void desenhar()
+{
     glClear(GL_COLOR_BUFFER_BIT);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    // Desenha os eixos
+    // ==========================================
+    // Eixos
+    // ==========================================
     desenharEixos();
 
     if (!pontosControle.empty()) {
 
-        // Desenha o polígono de controle,
-        // caso essa opção esteja ativada
+        // ==========================================
+        // CURVA ORIGINAL
+        // ==========================================
         if (exibirPoligono) {
             desenharPoligonoDeControle();
         }
 
-        // Desenha a curva de Bézier
         glColor3f(0.9f, 0.1f, 0.1f);
         glLineWidth(2.5f);
 
@@ -122,10 +128,46 @@ void desenhar() {
         }
 
         glEnd();
+
+
+        // ==========================================
+        // CURVA TRANSFORMADA
+        // ==========================================
+        if (exibirTransformada) {
+
+            glPushMatrix();
+
+            aplicarTransformacoesAcumuladas();
+
+            if (exibirPoligono) {
+                desenharPoligonoDeControle();
+            }
+
+            glColor3f(0.1f, 0.3f, 0.9f);
+            glLineWidth(2.5f);
+
+            glBegin(GL_LINE_STRIP);
+
+            for (int i = 0; i <= amostras; ++i) {
+
+                const double t =
+                    static_cast<double>(i) / amostras;
+
+                const Ponto ponto =
+                    calcularBezier(t);
+
+                glVertex2d(ponto.x, ponto.y);
+            }
+
+            glEnd();
+
+            glPopMatrix();
+        }
     }
 
     glutSwapBuffers();
 }
+
 
 // ==========================================
 // Redimensionamento da janela
