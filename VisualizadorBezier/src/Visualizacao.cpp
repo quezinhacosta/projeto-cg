@@ -111,6 +111,22 @@ void desenhar() {
         const int amostras = 100;
 
         for (const auto& contorno : figuraBezier) {
+            if (contorno.size() < 4 || (contorno.size() - 1) % 3 != 0) {
+                if (contorno.size() == 1) {
+                    glPointSize(4.0f);
+                    glBegin(GL_POINTS);
+                    glVertex2d(contorno.front().x, contorno.front().y);
+                    glEnd();
+                } else if (contorno.size() > 1) {
+                    glBegin(GL_LINE_STRIP);
+                    for (const auto& ponto : contorno) {
+                        glVertex2d(ponto.x, ponto.y);
+                    }
+                    glEnd();
+                }
+                continue;
+            }
+
             glBegin(GL_LINE_STRIP);
             for (std::size_t i = 0; i + 3 < contorno.size(); i += 3) {
                 for (int amostra = 0; amostra <= amostras; ++amostra) {

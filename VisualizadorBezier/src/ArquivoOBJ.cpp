@@ -64,23 +64,19 @@ bool carregarObj(const std::string& caminho) {
 
     std::size_t totalPontos = 0;
     std::size_t totalCurvas = 0;
-    for (std::size_t i = 0; i < figura.size(); ++i) {
-        const std::size_t quantidade = figura[i].size();
-        totalPontos += quantidade;
-
-        if (quantidade < 4 || (quantidade - 1) % 3 != 0) {
-            std::cerr << "Erro: o contorno " << (i + 1) << " de " << caminho
-                      << " possui " << quantidade
-                      << " pontos; cada contorno deve ter ao menos 4 pontos "
-                         "e obedecer a regra 3k + 1.\n";
-            return false;
+    std::size_t totalPolilinhas = 0;
+    for (const auto& contorno : figura) {
+        totalPontos += contorno.size();
+        if (contorno.size() >= 4 && (contorno.size() - 1) % 3 == 0) {
+            totalCurvas += (contorno.size() - 1) / 3;
+        } else {
+            ++totalPolilinhas;
         }
-
-        totalCurvas += (quantidade - 1) / 3;
     }
 
-    if (totalPontos < 4) {
-        std::cerr << "Erro: o arquivo precisa conter ao menos 4 pontos de controle.\n";
+    if (totalPontos == 0) {
+        std::cerr << "Erro: o arquivo nao contem vertices 'v x y': "
+                  << caminho << ".\n";
         return false;
     }
 
@@ -93,7 +89,8 @@ bool carregarObj(const std::string& caminho) {
 
     std::cout << "Arquivo carregado com sucesso: " << caminho
               << " (" << totalPontos << " pontos, "
-              << totalCurvas << " trechos cubicos em "
+              << totalCurvas << " trechos cubicos, "
+              << totalPolilinhas << " polilinha(s) em "
               << figuraBezier.size() << " contorno(s))\n";
 
     return true;
