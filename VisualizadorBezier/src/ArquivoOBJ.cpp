@@ -8,6 +8,7 @@
 #include <string>
 #include <utility>
 
+// Acesso à estrutura de contornos definida no programa principal
 extern FiguraBezier figuraBezier;
 
 // ==========================================
@@ -18,7 +19,7 @@ bool carregarObj(const std::string& caminho) {
     std::ifstream arquivo(caminho);
 
     if (!arquivo) {
-        std::cerr << "Nao foi possivel abrir: " << caminho << '\n';
+        std::cerr << "Erro: Nao foi possivel abrir o arquivo: " << caminho << '\n';
         return false;
     }
 
@@ -29,12 +30,16 @@ bool carregarObj(const std::string& caminho) {
 
     while (std::getline(arquivo, linha)) {
         ++numeroLinha;
+
+        // Limpeza de espaços em branco iniciais
         std::istringstream leitor(linha);
         std::string tipo;
+        
         if (!(leitor >> tipo) || tipo[0] == '#') {
-            continue;
+            continue; // Linha vazia ou comentário
         }
 
+        // Separação de objetos/grupos independentes (ex: pétalas, caule, folha)
         if (tipo == "o" || tipo == "g") {
             if (!contornoAtual.empty()) {
                 figura.push_back(std::move(contornoAtual));
@@ -43,13 +48,14 @@ bool carregarObj(const std::string& caminho) {
             continue;
         }
 
+        // Vértices 2D: v x y
         if (tipo == "v") {
             Ponto ponto;
 
             if (!(leitor >> ponto.x >> ponto.y)
                 || !std::isfinite(ponto.x)
                 || !std::isfinite(ponto.y)) {
-                std::cerr << "Erro: vertice invalido na linha "
+                std::cerr << "Erro: Vertice invalido na linha "
                           << numeroLinha << " de " << caminho << ".\n";
                 return false;
             }
@@ -58,13 +64,16 @@ bool carregarObj(const std::string& caminho) {
         }
     }
 
+    // Adiciona o último contorno lido se não estiver vazio
     if (!contornoAtual.empty()) {
         figura.push_back(std::move(contornoAtual));
     }
 
+    // Contabilização e validação das curvas
     std::size_t totalPontos = 0;
     std::size_t totalCurvas = 0;
     std::size_t totalPolilinhas = 0;
+
     for (const auto& contorno : figura) {
         totalPontos += contorno.size();
         if (contorno.size() >= 4 && (contorno.size() - 1) % 3 == 0) {
@@ -75,16 +84,17 @@ bool carregarObj(const std::string& caminho) {
     }
 
     if (totalPontos == 0) {
-        std::cerr << "Erro: o arquivo nao contem vertices 'v x y': "
+        std::cerr << "Erro: O arquivo nao contem vertices 'v x y': "
                   << caminho << ".\n";
         return false;
     }
 
-    if (totalPontos < 300) {
-        std::cout << "Aviso: o arquivo contem " << totalPontos
+   if (totalPontos < 300) {
+        std::cout << "Aviso: O arquivo contem " << totalPontos
                   << " pontos de controle (a entrega final exige no minimo 300).\n";
     }
 
+    // Substitui a figura apenas após validação completa com sucesso
     figuraBezier = std::move(figura);
 
     std::cout << "Arquivo carregado com sucesso: " << caminho
@@ -102,7 +112,7 @@ bool carregarObj(const std::string& caminho) {
 
 bool salvarObj(const std::string& caminho) {
     if (figuraBezier.empty()) {
-        std::cerr << "Nenhum ponto de controle para salvar.\n";
+        std::cerr << "Erro: Nenhum ponto de controle para salvar.\n";
         return false;
     }
 
