@@ -17,6 +17,7 @@
 extern std::vector<Ponto> pontosControle;
 
 extern bool exibirPoligono;
+extern bool exibirTransformada;
 
 extern double esquerda;
 extern double direita;
@@ -27,10 +28,11 @@ extern double cima;
 // Eixos X e Y
 // ==========================================
 
-void desenharEixos() {
+void desenharEixos()
+{
     glLineWidth(2.0f);
 
-    // Eixo X: verde
+    // Eixo X - verde
     glColor3f(0.0f, 0.7f, 0.0f);
 
     glBegin(GL_LINES);
@@ -40,7 +42,7 @@ void desenharEixos() {
 
     glEnd();
 
-    // Eixo Y: azul
+    // Eixo Y - azul
     glColor3f(0.0f, 0.2f, 1.0f);
 
     glBegin(GL_LINES);
@@ -55,7 +57,8 @@ void desenharEixos() {
 // Polígono de controle
 // ==========================================
 
-void desenharPoligonoDeControle() {
+void desenharPoligonoDeControle()
+{
     if (pontosControle.empty()) {
         return;
     }
@@ -72,7 +75,7 @@ void desenharPoligonoDeControle() {
 
     glEnd();
 
-    // Vértices de controle
+    // Pontos de controle
     glColor3f(0.2f, 0.2f, 0.2f);
     glPointSize(6.0f);
 
@@ -89,7 +92,6 @@ void desenharPoligonoDeControle() {
 // Desenho principal
 // ==========================================
 
-
 void desenhar()
 {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -100,6 +102,7 @@ void desenhar()
     // ==========================================
     // Eixos
     // ==========================================
+
     desenharEixos();
 
     if (!pontosControle.empty()) {
@@ -107,6 +110,7 @@ void desenhar()
         // ==========================================
         // CURVA ORIGINAL
         // ==========================================
+
         if (exibirPoligono) {
             desenharPoligonoDeControle();
         }
@@ -114,25 +118,13 @@ void desenhar()
         glColor3f(0.9f, 0.1f, 0.1f);
         glLineWidth(2.5f);
 
-        glBegin(GL_LINE_STRIP);
-
-        const int amostras = 100;
-
-        for (int i = 0; i <= amostras; ++i) {
-            const double t =
-                static_cast<double>(i) / amostras;
-
-            const Ponto ponto = calcularBezier(t);
-
-            glVertex2d(ponto.x, ponto.y);
-        }
-
-        glEnd();
+        desenharCurvaBezier();
 
 
         // ==========================================
         // CURVA TRANSFORMADA
         // ==========================================
+
         if (exibirTransformada) {
 
             glPushMatrix();
@@ -146,20 +138,7 @@ void desenhar()
             glColor3f(0.1f, 0.3f, 0.9f);
             glLineWidth(2.5f);
 
-            glBegin(GL_LINE_STRIP);
-
-            for (int i = 0; i <= amostras; ++i) {
-
-                const double t =
-                    static_cast<double>(i) / amostras;
-
-                const Ponto ponto =
-                    calcularBezier(t);
-
-                glVertex2d(ponto.x, ponto.y);
-            }
-
-            glEnd();
+            desenharCurvaBezier();
 
             glPopMatrix();
         }
@@ -168,25 +147,28 @@ void desenhar()
     glutSwapBuffers();
 }
 
-
 // ==========================================
 // Redimensionamento da janela
 // ==========================================
 
-void redimensionar(int largura, int altura) {
+void redimensionar(int largura, int altura)
+{
     largura = std::max(largura, 1);
     altura = std::max(altura, 1);
 
     glViewport(0, 0, largura, altura);
 
-    // Ajusta a escala incluindo a origem
-    // para manter os dois eixos visíveis
+    // ==========================================
+    // Calcula os limites dos pontos
+    // ==========================================
+
     double minX = 0.0;
     double maxX = 0.0;
     double minY = 0.0;
     double maxY = 0.0;
 
     for (const Ponto& ponto : pontosControle) {
+
         minX = std::min(minX, ponto.x);
         maxX = std::max(maxX, ponto.x);
 
@@ -216,10 +198,12 @@ void redimensionar(int largura, int altura) {
         static_cast<double>(largura) / altura;
 
     if (larguraVisivel / alturaVisivel < proporcaoJanela) {
+
         larguraVisivel =
             alturaVisivel * proporcaoJanela;
     }
     else {
+
         alturaVisivel =
             larguraVisivel / proporcaoJanela;
     }
@@ -236,7 +220,12 @@ void redimensionar(int largura, int altura) {
     cima =
         centroY + alturaVisivel / 2.0;
 
+    // ==========================================
+    // Projeção
+    // ==========================================
+
     glMatrixMode(GL_PROJECTION);
+
     glLoadIdentity();
 
     gluOrtho2D(
