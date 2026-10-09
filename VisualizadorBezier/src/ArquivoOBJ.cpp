@@ -7,12 +7,7 @@
 #include <string>
 #include <vector>
 
-// Acesso aos pontos de controle definidos no programa principal
 extern std::vector<Ponto> pontosControle;
-
-// ==========================================
-// Carregar arquivo OBJ
-// ==========================================
 
 bool carregarObj(const std::string& caminho) {
     std::ifstream arquivo(caminho);
@@ -31,7 +26,6 @@ bool carregarObj(const std::string& caminho) {
 
         leitor >> tipo;
 
-        // Linhas que indicam vertices com coordenadas (x, y)
         if (tipo == "v") {
             Ponto ponto;
 
@@ -40,7 +34,6 @@ bool carregarObj(const std::string& caminho) {
             }
         }
 
-        // Comentarios (#) e linhas vazias sao ignorados
     }
 
     if (pontos.empty()) {
@@ -54,7 +47,6 @@ bool carregarObj(const std::string& caminho) {
             << pontos.size() << "\n";
 
 
-    // So substitui os pontos depois que o arquivo foi validado
     pontosControle = pontos;
 
     std::cout << "Arquivo carregado: " << caminho << '\n';
@@ -62,9 +54,6 @@ bool carregarObj(const std::string& caminho) {
     return true;
 }
 
-// ==========================================
-// Salvar arquivo OBJ
-// ==========================================
 
 bool salvarObj(const std::string& caminho) {
     if (pontosControle.empty()) {

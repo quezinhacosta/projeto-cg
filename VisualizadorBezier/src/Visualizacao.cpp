@@ -10,10 +10,6 @@
 
 #include <GL/glut.h>
 
-// ==========================================
-// Variáveis externas
-// ==========================================
-
 extern std::vector<Ponto> pontosControle;
 
 extern bool exibirPoligono;
@@ -24,15 +20,10 @@ extern double direita;
 extern double baixo;
 extern double cima;
 
-// ==========================================
-// Eixos X e Y
-// ==========================================
-
 void desenharEixos()
 {
     glLineWidth(2.0f);
 
-    // Eixo X - verde
     glColor3f(0.0f, 0.7f, 0.0f);
 
     glBegin(GL_LINES);
@@ -42,7 +33,6 @@ void desenharEixos()
 
     glEnd();
 
-    // Eixo Y - azul
     glColor3f(0.0f, 0.2f, 1.0f);
 
     glBegin(GL_LINES);
@@ -53,17 +43,12 @@ void desenharEixos()
     glEnd();
 }
 
-// ==========================================
-// Polígono de controle
-// ==========================================
-
 void desenharPoligonoDeControle()
 {
     if (pontosControle.empty()) {
         return;
     }
 
-    // Arestas do polígono
     glColor3f(0.5f, 0.5f, 0.5f);
     glLineWidth(1.0f);
 
@@ -75,7 +60,6 @@ void desenharPoligonoDeControle()
 
     glEnd();
 
-    // Pontos de controle
     glColor3f(0.2f, 0.2f, 0.2f);
     glPointSize(6.0f);
 
@@ -88,10 +72,6 @@ void desenharPoligonoDeControle()
     glEnd();
 }
 
-// ==========================================
-// Desenho principal
-// ==========================================
-
 void desenhar()
 {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -99,17 +79,9 @@ void desenhar()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    // ==========================================
-    // Eixos
-    // ==========================================
-
     desenharEixos();
 
     if (!pontosControle.empty()) {
-
-        // ==========================================
-        // CURVA ORIGINAL
-        // ==========================================
 
         if (exibirPoligono) {
             desenharPoligonoDeControle();
@@ -120,10 +92,6 @@ void desenhar()
 
         desenharCurvaBezier();
 
-
-        // ==========================================
-        // CURVA TRANSFORMADA
-        // ==========================================
 
         if (exibirTransformada) {
 
@@ -147,20 +115,12 @@ void desenhar()
     glutSwapBuffers();
 }
 
-// ==========================================
-// Redimensionamento da janela
-// ==========================================
-
 void redimensionar(int largura, int altura)
 {
     largura = std::max(largura, 1);
     altura = std::max(altura, 1);
 
     glViewport(0, 0, largura, altura);
-
-    // ==========================================
-    // Calcula os limites dos pontos
-    // ==========================================
 
     double minX = 0.0;
     double maxX = 0.0;
@@ -220,9 +180,6 @@ void redimensionar(int largura, int altura)
     cima =
         centroY + alturaVisivel / 2.0;
 
-    // ==========================================
-    // Projeção
-    // ==========================================
 
     glMatrixMode(GL_PROJECTION);
 

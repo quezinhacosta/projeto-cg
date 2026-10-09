@@ -13,16 +13,11 @@
 #include <GL/glut.h>
 #include <GL/glui.h>
 
-// ==========================================
-// Variáveis da interface
-// ==========================================
-
 int janelaVisualizacao = 0;
 
 GLUI_EditText* campoArquivo = nullptr;
 GLUI_EditText* campoSalvar = nullptr;
 
-// Campos das transformações
 GLUI_EditText* campoRotacao = nullptr;
 
 GLUI_EditText* campoTranslacaoX = nullptr;
@@ -34,16 +29,8 @@ GLUI_EditText* campoEscalaY = nullptr;
 GLUI_EditText* campoCisalhamentoX = nullptr;
 GLUI_EditText* campoCisalhamentoY = nullptr;
 
-// ==========================================
-// Controle do menu
-// ==========================================
-
 bool exibirPoligono = false;
 bool exibirTransformada = true;
-
-// ==========================================
-// Transformações acumuladas
-// ==========================================
 
 enum TipoTransformacao
 {
@@ -65,10 +52,6 @@ struct Transformacao
 };
 
 std::vector<Transformacao> transformacoes;
-
-// ==========================================
-// Menu do botão direito
-// ==========================================
 
 void menuCallback(int opcao)
 {
@@ -103,9 +86,6 @@ void criarMenu()
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
-// ==========================================
-// Carregar pela interface
-// ==========================================
 
 void carregarPelaInterface(int)
 {
@@ -127,8 +107,6 @@ void carregarPelaInterface(int)
         return;
     }
 
-    // Ao carregar uma nova curva,
-    // começamos novamente sem transformações.
     resetarTransformacoes();
 
     glutSetWindow(janelaVisualizacao);
@@ -141,10 +119,6 @@ void carregarPelaInterface(int)
     std::cout
         << "Curva atualizada pela interface.\n";
 }
-
-// ==========================================
-// Salvar pela interface
-// ==========================================
 
 void salvarPelaInterface(int)
 {
@@ -165,9 +139,6 @@ void salvarPelaInterface(int)
     salvarObj(caminho);
 }
 
-// ==========================================
-// Botão Sair
-// ==========================================
 
 void botaoSairCallback(int)
 {
@@ -192,9 +163,6 @@ double lerValor(GLUI_EditText* campo)
         return 0.0;
     }
 }
-// ==========================================
-// ROTACAO
-// ==========================================
 
 void botaoRotacao(int)
 {
@@ -220,10 +188,6 @@ void botaoRotacao(int)
 
     glutPostRedisplay();
 }
-
-// ==========================================
-// TRANSLACAO
-// ==========================================
 
 void botaoTranslacao(int)
 {
@@ -254,9 +218,6 @@ void botaoTranslacao(int)
 
     glutPostRedisplay();
 }
-// ==========================================
-// ESCALA
-// ==========================================
 
 void botaoEscala(int)
 {
@@ -288,10 +249,6 @@ void botaoEscala(int)
     glutPostRedisplay();
 }
 
-// ==========================================
-// REFLEXAO EM X
-// ==========================================
-
 void botaoReflexaoX(int)
 {
     Transformacao transformacao;
@@ -308,10 +265,6 @@ void botaoReflexaoX(int)
     glutPostRedisplay();
 }
 
-// ==========================================
-// REFLEXAO EM Y
-// ==========================================
-
 void botaoReflexaoY(int)
 {
     Transformacao transformacao;
@@ -327,10 +280,6 @@ void botaoReflexaoY(int)
 
     glutPostRedisplay();
 }
-
-// ==========================================
-// CISALHAMENTO EM X
-// ==========================================
 
 void botaoCisalhamentoX(int)
 {
@@ -357,10 +306,6 @@ void botaoCisalhamentoX(int)
     glutPostRedisplay();
 }
 
-// ==========================================
-// CISALHAMENTO EM Y
-// ==========================================
-
 void botaoCisalhamentoY(int)
 {
     if (campoCisalhamentoY == nullptr) {
@@ -385,10 +330,6 @@ void botaoCisalhamentoY(int)
 
     glutPostRedisplay();
 }
-
-// ==========================================
-// Aplicar todas as transformações acumuladas
-// ==========================================
 
 void aplicarTransformacoesAcumuladas()
 {
@@ -433,10 +374,6 @@ void aplicarTransformacoesAcumuladas()
     }
 }
 
-// ==========================================
-// RESETAR TRANSFORMACOES
-// ==========================================
-
 void resetarTransformacoes()
 {
     transformacoes.clear();
@@ -462,10 +399,6 @@ void botaoDesenhoOriginalETransformado(int)
     glutPostRedisplay();
 }
 
-// ==========================================
-// Teclado
-// ==========================================
-
 void teclado(unsigned char tecla, int, int)
 {
     if (tecla == 'q' ||
@@ -476,9 +409,6 @@ void teclado(unsigned char tecla, int, int)
     }
 }
 
-// ==========================================
-// Interface GLUI
-// ==========================================
 void botaoResetarCallback(int)
 {
     resetarTransformacoes();
@@ -489,9 +419,6 @@ void criarInterface(const char* caminho)
     GLUI* interface =
         GLUI_Master.create_glui("Controles");
 
-    // ======================================
-    // ARQUIVO
-    // ======================================
 
     interface->add_statictext(
         "Arquivo"
@@ -529,10 +456,6 @@ void criarInterface(const char* caminho)
 
     interface->add_separator();
 
-    // ======================================
-    // ROTACAO
-    // ======================================
-
     interface->add_statictext(
         "Rotacao"
     );
@@ -551,10 +474,6 @@ void criarInterface(const char* caminho)
     );
 
     interface->add_separator();
-
-    // ======================================
-    // TRANSLACAO
-    // ======================================
 
     interface->add_statictext(
         "Translacao"
@@ -582,10 +501,6 @@ void criarInterface(const char* caminho)
 
     interface->add_separator();
 
-    // ======================================
-    // ESCALA
-    // ======================================
-
     interface->add_statictext(
         "Escala"
     );
@@ -612,10 +527,6 @@ void criarInterface(const char* caminho)
 
     interface->add_separator();
 
-    // ======================================
-    // REFLEXAO
-    // ======================================
-
     interface->add_statictext(
         "Reflexao"
     );
@@ -633,10 +544,6 @@ void criarInterface(const char* caminho)
     );
 
     interface->add_separator();
-
-    // ======================================
-    // CISALHAMENTO
-    // ======================================
 
     interface->add_statictext(
         "Cisalhamento"
@@ -670,10 +577,6 @@ void criarInterface(const char* caminho)
 
     interface->add_separator();
 
-    // ======================================
-    // RESET
-    // ======================================
-
     interface->add_button(
         "Resetar transformacoes",
         0,
@@ -700,10 +603,6 @@ void criarInterface(const char* caminho)
     );
 
     interface->add_separator();
-
-    // ======================================
-    // SAIR
-    // ======================================
 
     interface->add_button(
         "Sair",

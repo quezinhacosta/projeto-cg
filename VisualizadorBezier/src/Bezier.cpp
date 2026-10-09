@@ -8,9 +8,6 @@
 
 extern std::vector<Ponto> pontosControle;
 
-// ==========================================
-// Bézier cúbica
-// ==========================================
 
 Ponto bezierCubica(
     const Ponto& p0,
@@ -43,10 +40,6 @@ Ponto bezierCubica(
     return resultado;
 }
 
-// ==========================================
-// Desenhar curva usando vários segmentos
-// de Bézier cúbica
-// ==========================================
 
 void desenharCurvaBezier()
 {
