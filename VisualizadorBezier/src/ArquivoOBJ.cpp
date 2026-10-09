@@ -8,12 +8,7 @@
 #include <string>
 #include <utility>
 
-// Acesso à estrutura de contornos definida no programa principal
-extern FiguraBezier figuraBezier;
-
-// ==========================================
-// Carregar arquivo OBJ
-// ==========================================
+extern std::vector<Ponto> pontosControle;
 
 bool carregarObj(const std::string& caminho) {
     std::ifstream arquivo(caminho);
@@ -48,7 +43,6 @@ bool carregarObj(const std::string& caminho) {
             continue;
         }
 
-        // Vértices 2D: v x y
         if (tipo == "v") {
             Ponto ponto;
 
@@ -60,14 +54,11 @@ bool carregarObj(const std::string& caminho) {
                 return false;
             }
 
-            contornoAtual.push_back(ponto);
-        }
     }
 
-    // Adiciona o último contorno lido se não estiver vazio
-    if (!contornoAtual.empty()) {
-        figura.push_back(std::move(contornoAtual));
-    }
+    if (pontos.empty()) {
+        std::cerr
+            << "O arquivo nao possui pontos de controle.\n";
 
     // Contabilização e validação das curvas
     std::size_t totalPontos = 0;
@@ -89,10 +80,11 @@ bool carregarObj(const std::string& caminho) {
         return false;
     }
 
-   if (totalPontos < 300) {
-        std::cout << "Aviso: O arquivo contem " << totalPontos
-                  << " pontos de controle (a entrega final exige no minimo 300).\n";
-    }
+    std::cout << "Quantidade de pontos carregados: "
+            << pontos.size() << "\n";
+
+
+    pontosControle = pontos;
 
     // Substitui a figura apenas após validação completa com sucesso
     figuraBezier = std::move(figura);
@@ -106,9 +98,6 @@ bool carregarObj(const std::string& caminho) {
     return true;
 }
 
-// ==========================================
-// Salvar arquivo OBJ
-// ==========================================
 
 bool salvarObj(const std::string& caminho) {
     if (figuraBezier.empty()) {
